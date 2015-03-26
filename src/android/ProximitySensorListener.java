@@ -40,6 +40,8 @@ import android.content.Context;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
+import android.util.Log;
 
 /**
  * This class listens to the proximity sensor and stores the latest value. 
@@ -65,6 +67,9 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
     private SensorManager sensorManager;// Sensor manager
     Sensor mSensor;                     // Compass sensor returned by sensor manager
 
+    private PowerManager powerManager;
+    private PowerManager.WakeLock wakeLock;
+
     private CallbackContext callbackContext;
 
     /**
@@ -86,6 +91,9 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         this.sensorManager = (SensorManager) cordova.getActivity().getSystemService(Context.SENSOR_SERVICE);
+        this.powerManager = (PowerManager) cordova.getActivity().getSystemService(Context.POWER_SERVICE);
+        this.wakeLock = null;
+
     }
 
     /**
@@ -121,6 +129,10 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
                 }, 2000);
             }
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, getProximity()));
+        } else if (action.equals("enableProximityScreenOff")) {
+            this.enableProximityScreenOff();
+        } else if (action.equals("disableProximityScreenOff")) {
+            this.disableProximityScreenOff();
         } else {
             // Unsupported action
             return false;
@@ -274,6 +286,27 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
     private void setStatus(int status) {
         this.status = status;
     }
-	
+
+    /**
+     *
+     */
+    public void enableProximityScreenOff() {
+        Log.d("ProximitySensorListener", "XXX enableProximityScreenOff");
+        if(wakeLock != null) {
+            wakeLock.release();
+        }
+        wakeLock = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, ProximitySensorListener.this.toString());
+        wakeLock.acquire();
+    }
+
+    /**
+     *
+     */
+    public void disableProximityScreenOff() {
+        if(wakeLock != null) {
+            wakeLock.release();
+            wakeLock = null;
+        }
+    }
 }
 

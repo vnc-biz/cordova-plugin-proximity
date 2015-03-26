@@ -48,6 +48,20 @@ var proximity = {
      */
     disableSensor: function() {
         exec(null, null, "Proximity", "stop", []);
+    },
+
+    /**
+     *  
+     */
+    enableProximityScreenOff: function() {
+        exec(null, null, "Proximity", "enableProximityScreenOff", []);
+    },
+
+    /**
+     *  
+     */
+    disableProximityScreenOff: function() {
+        exec(null, null, "Proximity", "disableProximityScreenOff", []);
     }
 };
 module.exports = proximity;
