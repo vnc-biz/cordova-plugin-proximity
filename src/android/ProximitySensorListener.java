@@ -171,21 +171,26 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
         }
 
         // Get proximity sensor from sensor manager
-        @SuppressWarnings("deprecation")
-        List<Sensor> list = this.sensorManager.getSensorList(Sensor.TYPE_PROXIMITY);
+        //@SuppressWarnings("deprecation")
+        //List<Sensor> list = this.sensorManager.getSensorList(Sensor.TYPE_PROXIMITY);
 
-        // If found, then register as listener
-        if (list != null && list.size() > 0) {
-            this.mSensor = list.get(0);
-            this.sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            this.lastAccessTime = System.currentTimeMillis();
-            this.setStatus(ProximitySensorListener.STARTING);
-        }
+        this.mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.lastAccessTime = System.currentTimeMillis();
+        this.setStatus(ProximitySensorListener.STARTING);
 
-        // If error, then set status to error
-        else {
-            this.setStatus(ProximitySensorListener.ERROR_FAILED_TO_START);
-        }
+//        // If found, then register as listener
+//        if (list != null && list.size() > 0) {
+//            this.mSensor = list.get(0);
+//            this.sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+//            this.lastAccessTime = System.currentTimeMillis();
+//            this.setStatus(ProximitySensorListener.STARTING);
+//        }
+//
+//        // If error, then set status to error
+//        else {
+//            this.setStatus(ProximitySensorListener.ERROR_FAILED_TO_START);
+//        }
 
         return this.status;
     }
@@ -223,8 +228,11 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
      */
     public void onSensorChanged(SensorEvent event) {
 
-        int proximity; 
-        
+        int proximity;
+
+        Log.d("ProximitySensorListener", "XXX onSensorChanged sensor length -> " + event.values.length);
+        Log.d("ProximitySensorListener", "XXX onSensorChanged [0]-> " + event.values[0] + " [1]-> " + event.values[1] + " [2]-> " + event.values[2]);
+
         if (event.values[0] == 0) {
             proximity = ProximitySensorListener.NEAR;
         } else {
