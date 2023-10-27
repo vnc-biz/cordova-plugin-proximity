@@ -27,6 +27,13 @@ var argscheck = require('cordova/argscheck'),
     exec = require("cordova/exec");
 
 var proximity = {
+
+    registerRemoteEvents: function(actionCallback) {
+      // Need to call a native function to start recieve events on android
+      exec(null, null, "proximity", "registerRemoteEvents", []);
+      this.actionCallback = actionCallback;
+    },
+
     /**
      *  Get the current proximity sensor state.
      *  @param successCallback  callback function which delivers the boolean sensor state
@@ -51,17 +58,27 @@ var proximity = {
     },
 
     /**
-     *  
+     *
      */
     enableProximityScreenOff: function() {
         exec(null, null, "Proximity", "enableProximityScreenOff", []);
     },
 
     /**
-     *  
+     *
      */
     disableProximityScreenOff: function() {
         exec(null, null, "Proximity", "disableProximityScreenOff", []);
+    },
+
+    proximitySensorNear: function() {
+      this.actionCallback && this.actionCallback('proximitySensorNear');
+    },
+
+    proximitySensorFar: function() {
+      this.actionCallback && this.actionCallback('proximitySensorFar');
     }
+
+
 };
 module.exports = proximity;

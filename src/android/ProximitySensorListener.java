@@ -17,7 +17,7 @@
        under the License.
 */
 
-// reference: https://github.com/gdmec/lightsensor  
+// reference: https://github.com/gdmec/lightsensor
 
 package org.awokenwell.proximity;
 
@@ -44,7 +44,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 /**
- * This class listens to the proximity sensor and stores the latest value. 
+ * This class listens to the proximity sensor and stores the latest value.
  */
 public class ProximitySensorListener extends CordovaPlugin implements SensorEventListener {
 
@@ -52,10 +52,11 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
     public static int STARTING = 1;
     public static int RUNNING = 2;
     public static int ERROR_FAILED_TO_START = 3;
+    protected static CordovaWebView mCachedWebView = null;
 
     private static final String LOG_TAG = "ProximitySensorListener";
 
-    // sensor result 
+    // sensor result
     public static int NEAR = 1;
     public static int FAR = 0;
 
@@ -92,6 +93,7 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
      */
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+        mCachedWebView = webView;
         this.sensorManager = (SensorManager) cordova.getActivity().getSystemService(Context.SENSOR_SERVICE);
         this.powerManager = (PowerManager) cordova.getActivity().getSystemService(Context.POWER_SERVICE);
         this.wakeLock = null;
@@ -105,7 +107,7 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
      * @param args                  JSONArry of arguments for the plugin.
      * @param callbackContext       The callback id used when calling back into JavaScript.
      * @return                      True if the action was valid.
-     * @throws JSONException 
+     * @throws JSONException
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("start")) {
@@ -228,8 +230,10 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
 
         if (event.values[0] == 0) {
             proximity = ProximitySensorListener.NEAR;
+            mCachedWebView.sendJavascript("cordova.require('org.opentelecom.proximity.proximity').proximitySensorNear();");
         } else {
             proximity = ProximitySensorListener.FAR;
+            mCachedWebView.sendJavascript("cordova.require('org.opentelecom.proximity.proximity').proximitySensorFar();");
         }
 
         // Save proximity
@@ -310,4 +314,3 @@ public class ProximitySensorListener extends CordovaPlugin implements SensorEven
         }
     }
 }
-
